@@ -1,49 +1,61 @@
 """
-Written by ChatGPT
+Written by ChatGPT & Claude.ai
 """
 
+from pandas import DataFrame
 import matplotlib.pyplot as plt
 
 
 class DataPlotter:
-    def __init__(self, dataframes):
+    def __init__(self, dataframes: list[DataFrame]):
         self.dataframes = dataframes if isinstance(dataframes, list) else [dataframes]
+        self.combined_data = self._combine_dataframes()
+        self.colors = [
+            "#1f77b4",
+            "#ff7f0e",
+            "#2ca02c",
+            "#d62728",
+            "#9467bd",
+            "#8c564b",
+            "#e377c2",
+            "#7f7f7f",
+            "#bcbd22",
+            "#17becf",
+        ]
 
-    def plot(self):
+    def plot_count(self):
         """
-        Plots the data. If multiple DataFrames are provided, they are combined for comparison.
+        Plots the file counts from the combined data.
         """
-        combined_data = self._combine_dataframes()
+        self._plot_data(column="file_count", title="파일 개수", ylabel="파일 개수")
 
-        # Create subplots
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+    def plot_size(self):
+        """
+        Plots the total sizes from the combined data.
+        """
+        self._plot_data(
+            column="total_size", title="파일 크기", ylabel="파일 크기 (bytes)"
+        )
 
-        # Plot file counts
-        for label, data in combined_data.items():
-            ax1.plot(
+    def _plot_data(self, column: str, title: str, ylabel: str):
+        """
+        Generic plotting method to reduce code duplication
+        """
+        plt.figure(figsize=(12, 4))
+
+        for i, (label, data) in enumerate(self.combined_data.items()):
+            plt.plot(
                 data["date"],
-                data["file_count"],
-                marker="o",
-                label=f"{label} - File Count",
+                data[column],
+                color=self.colors[i % len(self.colors)],
+                label=f"{label} - {title}",
+                linewidth=2,
             )
-        ax1.set_ylabel("파일 개수")
-        ax1.set_title("날짜별 파일 개수 비교")
-        ax1.legend()
-        ax1.grid(True)
 
-        # Plot total sizes
-        for label, data in combined_data.items():
-            ax2.plot(
-                data["date"],
-                data["total_size"],
-                marker="x",
-                label=f"{label} - Total Size",
-            )
-        ax2.set_ylabel("파일 크기 (bytes)")
-        ax2.set_title("날짜별 파일 크기 비교")
-        ax2.legend()
-        ax2.grid(True)
-
+        plt.ylabel(ylabel)
+        plt.title(f"날짜별 {title} 비교")
+        plt.legend()
+        plt.grid(True)
         plt.xlabel("날짜")
         plt.xticks(rotation=45)
         plt.tight_layout()
@@ -51,8 +63,7 @@ class DataPlotter:
 
     def _combine_dataframes(self):
         """
-        Combines multiple dataframes for plotting. Ensures consistent date range for comparison.
-        Returns a dictionary of DataFrames keyed by label.
+        Combines multiple dataframes for plotting.
         """
         combined_data = {}
         for i, df in enumerate(self.dataframes):

@@ -16,14 +16,18 @@ class TestDataPlotter(unittest.TestCase):
         """
         self.df_a = pd.DataFrame(
             {
-                "date": [datetime.now().date() - timedelta(days=i) for i in range(3)],
+                "date": [
+                    datetime.now().date() - timedelta(days=i) for i in range(2, -1, -1)
+                ],
                 "file_count": [5, 10, 15],
                 "total_size": [500, 1000, 1500],
             }
         )
         self.df_b = pd.DataFrame(
             {
-                "date": [datetime.now().date() - timedelta(days=i) for i in range(3)],
+                "date": [
+                    datetime.now().date() - timedelta(days=i) for i in range(2, -1, -1)
+                ],
                 "file_count": [2, 4, 6],
                 "total_size": [200, 400, 600],
             }
@@ -35,7 +39,8 @@ class TestDataPlotter(unittest.TestCase):
         """
         plotter = DataPlotter(self.df_a)
         try:
-            plotter.plot()
+            plotter.plot_count()
+            plotter.plot_size()
         except Exception as e:
             self.fail(f"plot() raised an exception: {e}")
 
@@ -45,7 +50,8 @@ class TestDataPlotter(unittest.TestCase):
         """
         plotter = DataPlotter([self.df_a, self.df_b])
         try:
-            plotter.plot()
+            plotter.plot_count()
+            plotter.plot_size()
         except Exception as e:
             self.fail(f"plot() raised an exception: {e}")
 
