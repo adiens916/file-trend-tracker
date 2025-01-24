@@ -27,14 +27,14 @@ class DataPlotter:
         """
         Plots the file counts from the combined data.
         """
-        self._plot_data(column="file_count", title="파일 개수", ylabel="파일 개수")
+        self._plot_data(column="file_count", title="File Count", ylabel="file count")
 
     def plot_size(self):
         """
         Plots the total sizes from the combined data.
         """
         self._plot_data(
-            column="total_size", title="파일 크기", ylabel="파일 크기 (bytes)"
+            column="total_size", title="File Size", ylabel="file size (bytes)"
         )
 
     def _plot_data(self, column: str, title: str, ylabel: str):
@@ -48,15 +48,15 @@ class DataPlotter:
                 data["date"],
                 data[column],
                 color=self.colors[i % len(self.colors)],
-                label=f"{label} - {title}",
+                label=f"{label}",
                 linewidth=2,
             )
 
         plt.ylabel(ylabel)
-        plt.title(f"날짜별 {title} 비교")
+        plt.title(f"{title} By Date")
         plt.legend()
         plt.grid(True)
-        plt.xlabel("날짜")
+        plt.xlabel("date")
         plt.xticks(rotation=45)
         plt.tight_layout()
         plt.show()
