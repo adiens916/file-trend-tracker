@@ -4,6 +4,7 @@ Written by ChatGPT & Claude.ai
 
 from pandas import DataFrame
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 
 class DataPlotter:
@@ -41,7 +42,7 @@ class DataPlotter:
         """
         Generic plotting method to reduce code duplication
         """
-        plt.figure(figsize=(12, 4))
+        plt.figure()
 
         for i, (label, data) in enumerate(self.combined_data.items()):
             plt.plot(
@@ -66,8 +67,15 @@ class DataPlotter:
         plt.title(f"{title} By Date")
         plt.legend()
         plt.grid(True)
+
         plt.xlabel("date")
+        # 날짜 단위로 주요 틱 설정
+        plt.gca().xaxis.set_major_locator(mdates.DayLocator())
+        # 날짜 형식 지정
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+        # x축 레이블 기울기 조정
         plt.xticks(rotation=45)
+
         plt.tight_layout()
         plt.show()
 
