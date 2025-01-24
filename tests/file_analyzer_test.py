@@ -12,7 +12,8 @@ from file_trend_tracker.file_analyzer import FileAnalyzer
 
 
 class TestFileAnalyzer(unittest.TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpClass(self):
         """
         테스트용 디렉토리와 파일 생성
         """
@@ -27,7 +28,8 @@ class TestFileAnalyzer(unittest.TestCase):
             modified_time = (datetime.now() - timedelta(days=i)).timestamp()
             os.utime(file_path, (modified_time, modified_time))
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(self):
         """
         테스트 후 디렉토리 삭제
         """
