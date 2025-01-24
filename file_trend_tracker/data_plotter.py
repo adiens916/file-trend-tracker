@@ -49,7 +49,17 @@ class DataPlotter:
                 data[column],
                 color=self.colors[i % len(self.colors)],
                 label=f"{label}",
+                linestyle="--",
                 linewidth=2,
+            )
+
+            # 점 표시 추가
+            plt.scatter(
+                data["date"],
+                data[column],
+                color=self.colors[i % len(self.colors)],
+                marker="o",  # 원형 마커
+                s=50,  # 마커 크기
             )
 
         plt.ylabel(ylabel)
