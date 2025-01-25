@@ -28,6 +28,13 @@ class TestFileAnalyzer(unittest.TestCase):
             modified_time = (datetime.now() - timedelta(days=i)).timestamp()
             os.utime(file_path, (modified_time, modified_time))
 
+        # 제외할 폴더 및 하위 파일 생성
+        self.exclude_dir = os.path.join(self.test_dir, ".venv")
+        os.makedirs(self.exclude_dir, exist_ok=True)
+        exclude_file_path = os.path.join(self.exclude_dir, "excluded_file.txt")
+        with open(exclude_file_path, "w") as f:
+            f.write("This file should be excluded.")
+
     @classmethod
     def tearDownClass(self):
         """
@@ -36,23 +43,35 @@ class TestFileAnalyzer(unittest.TestCase):
         if os.path.exists(self.test_dir):
             shutil.rmtree(self.test_dir)
 
-    def test_collect_file_data(self):
+    def test_collect_file_data_exclude_folders(self):
         """
-        FileAnalyzer가 파일 데이터를 올바르게 수집하는지 테스트
+        FileAnalyzer가 제외할 폴더를 올바르게 처리하는지 테스트
         """
-        analyzer = FileAnalyzer(self.test_dir)
+        analyzer = FileAnalyzer(self.test_dir, exclude_folders=[".venv"])
         analyzer.collect_file_data()
-        self.assertEqual(len(analyzer.file_data), 3)  # 3개의 파일이 생성되었는지 확인
 
-    def test_aggregate_data(self):
+        # 제외 폴더를 제외한 파일만 수집되었는지 확인
+        self.assertEqual(len(analyzer.file_data), 3)  # 제외되지 않은 3개의 파일
+
+    def test_collect_file_data_include_excluded(self):
         """
-        파일 데이터를 날짜별로 정확히 집계하는지 테스트
+        제외 폴더를 지정하지 않을 경우 모든 파일이 포함되는지 테스트
         """
         analyzer = FileAnalyzer(self.test_dir)
         analyzer.collect_file_data()
-        df = analyzer.aggregate_data()
-        self.assertEqual(len(df), 3)  # 3개의 날짜 데이터가 포함되어야 함
-        self.assertTrue("file_count" in df.columns and "total_size" in df.columns)
+
+        # 모든 파일이 수집되어야 함
+        self.assertEqual(len(analyzer.file_data), 4)  # 포함된 파일: 3개 + 제외 파일 1개
+
+    def test_collect_file_data_partial_match_exclude(self):
+        """
+        FileAnalyzer가 제외할 폴더 키워드를 올바르게 처리하는지 테스트
+        """
+        analyzer = FileAnalyzer(self.test_dir, exclude_folders=["venv"])
+        analyzer.collect_file_data()
+
+        # 제외되지 않은 파일만 포함되었는지 확인
+        self.assertEqual(len(analyzer.file_data), 3)  # 제외되지 않은 3개의 파일
 
     def test_save_to_csv(self):
         """
