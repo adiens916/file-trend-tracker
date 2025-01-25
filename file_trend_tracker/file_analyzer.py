@@ -9,15 +9,24 @@ import pandas as pd
 
 
 class FileAnalyzer:
-    def __init__(self, folder_path):
+    def __init__(self, folder_path, exclude_folders=None):
+        """
+        :param folder_path: 탐색할 폴더 경로
+        :param exclude_folders: 제외할 폴더 이름 목록 (리스트 형태)
+        """
         self.folder_path = folder_path
+        self.exclude_folders = exclude_folders if exclude_folders else []
         self.file_data = []
 
     def collect_file_data(self):
         """
         Collects file data including modified date and size from the folder path.
+        Excludes folders in the exclude_folders list.
         """
-        for root, _, files in os.walk(self.folder_path):
+        for root, dirs, files in os.walk(self.folder_path):
+            # 제외할 폴더를 제거
+            dirs[:] = [d for d in dirs if d not in self.exclude_folders]
+
             for file in files:
                 file_path = os.path.join(root, file)
                 try:
